@@ -45,6 +45,13 @@ class UI{
         //append row to the list
         list.appendChild(row);
     }
+
+    //function to clear fields once submission is done
+    static clearFields(){
+        document.getElementById('title').value = '';
+        document.getElementById('author').value = '';
+        document.getElementById('isbn').value = '';
+    };
 }
 
 //STORE CLASS: HANDLES STORAGE
@@ -56,7 +63,25 @@ document.addEventListener('DOMContentLoaded', UI.displayBooks);   //as soon as p
 
 
 //EVENT: ADD A BOOK
+//target our form
+document.getElementById('book-form').addEventListener('submit', (e) => {
+    //prevent default submit
+    e.preventDefault();
 
+    //grab data from form
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const isbn = document.getElementById('isbn').value;
+
+    //instantiate book
+    const book = new Book(title, author, isbn);
+
+    //add book to UI
+    UI.addBookToList(book);
+
+    //clear fields
+    UI.clearFields();
+});
 
 
 //EVENT: REMOVE A BOOK
