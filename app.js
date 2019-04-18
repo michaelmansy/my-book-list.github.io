@@ -10,20 +10,8 @@ class Book{
 //UI CLASS: HANDLE UI TASKS
 class UI{
     static displayBooks(){
-        const storedBooks = [
-            {
-                title: 'Book one',
-                author: 'Jade Doe',
-                isbn: '343456'
-            },
-            {
-                title: 'Book two',
-                author: 'John Smith',
-                isbn: '45546'
-            }
-        ];
 
-        const books = storedBooks;
+        const books = Store.getBooks();
 
         //loop through the books and add them by calling the method addBookToList
         books.forEach((book) => UI.addBookToList(book));
@@ -75,7 +63,40 @@ class UI{
 }
 
 //STORE CLASS: HANDLES STORAGE
+class Store{
+    static getBooks(){
+        let books;
 
+        if(localStorage.getItem('books') === null){
+            books = [];
+        }else{
+            books = JSON.parse(localStorage.getItem('books'));
+        }
+
+        return books;
+    }
+
+    static addBook(book){
+        const books = Store.getBooks();
+
+        books.push(book);
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+
+    static removeBook(isbn){
+        const books = Store.getBooks();
+
+        //loop through books
+        books.forEach((book, index) => {
+            if(book.isbn === isbn){
+                books.splice(index,1);
+            }
+        });
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+}
 
 
 //EVENT: DISPLAY BOOKS
@@ -103,6 +124,12 @@ document.getElementById('book-form').addEventListener('submit', (e) => {
         //add book to UI
         UI.addBookToList(book);
 
+        //add book to Store
+        Store.addBook(book);
+
+        //show succes message
+        UI.showAlert('Your book has been successfully added', 'success');
+
         //clear fields
         UI.clearFields();
     }
@@ -113,4 +140,12 @@ document.getElementById('book-form').addEventListener('submit', (e) => {
 //EVENT: REMOVE A BOOK
 document.querySelector('#book-list').addEventListener('click', (e) => {
     UI.deleteBook(e.target);
+
+    //remove book from store
+    //to target isbn we go up to its parent element which is <td> and then the one previous whcih contains the isbn
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+
+
+    //show succes message
+    UI.showAlert('Your book has been successfully deleted', 'success');
 });
